@@ -5,8 +5,10 @@ function [ XSI1 ] = WGS(a, b, c, d, T)
 K = 10 ^(1910 / T - 1.764);
 P = 24;
 
-XSI1 = @(XSI1)[(c+XSI1).*(d+XSI1)./((a-XSI1).*(b-XSI1))];
+options = optimset('Display','off');
 
+Fct = @(XSI1)[(c+XSI1).*(d+XSI1)./((a-XSI1).*(b-XSI1))- K];
+XSI1 = fsolve(Fct,130,options);
 
 end
 
