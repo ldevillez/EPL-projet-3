@@ -8,7 +8,7 @@ P = 24;
 options = optimset('Display','off');
 
 Fct = @(XSI1)[(c+XSI1).*(d+XSI1)./((a-XSI1).*(b-XSI1))- K];
-XSI1 = fsolve(Fct,130,options);
+XSI1 = fsolve(Fct,20,options);
 
 end
 

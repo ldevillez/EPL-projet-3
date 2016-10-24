@@ -1,4 +1,4 @@
-function [Tab1 Tab2] = Gestion(FMethRefIN, FEauRefIN, TRefOUT, TWGS )
+function [Tab1, Tab2,Tab3,Purete] = Gestion(FMethRefIN, FEauRefIN, TRefOUT, TWGS )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -27,11 +27,11 @@ if(~isnumeric(TWGS))
     TWGS = 650;
 end
 
-
+format long
 %% Declaration et changement d'unite
 
-cpFour = 1200;%[J/kgK]
-cpProc = 2900 ;%[J/kgK]
+cpFour = 0.001200;%[J/kgK]
+cpProc = 0.002900 ;%[J/kgK]
 TFourIN = 300; %[K]
 TFourOUT = 1300; %[K]
 TRefIN = 300; %[K]
@@ -57,11 +57,7 @@ FH2RefOUT = 3 * XSI1 + XSI2;
 FCoRefOUT = XSI1 - XSI2;
 FCo2RefOUT = XSI2;
 
-%MEC LE PREMIER REACTEUR WGS C'EST PAS DANS LE REFORMEUR DONC IL T'EN
-%MANQUE UN CONNARD
-
-%% SECOND REACTEUR WGS
-
+%% PREMIER REACTEUR WGS
 [XSI3] = WGS(FCoRefOUT,FEauRefOUT,FH2RefOUT,FCo2RefOUT,TWGS);
 
 %Si complete alors
@@ -69,35 +65,63 @@ FCo2RefOUT = XSI2;
     XSI3 = min (FMethRefOUT, FEauRefOUT);
 %}
 
-FMethWGSOUT = FMethRefOUT;
-FEauWGSOUT = FEauRefOUT- XSI3;
-FH2WGSOUT = FH2RefOUT + XSI3;
-FCoWGSOUT = FCoRefOUT  - XSI3;
-FCo2WGSOUT = FCo2RefOUT + XSI3;
+FMethWGS1OUT = FMethRefOUT;
+FEauWGS1OUT = FEauRefOUT- XSI3;
+FH2WGS1OUT = FH2RefOUT + XSI3;
+FCoWGS1OUT = FCoRefOUT  - XSI3;
+FCo2WGS1OUT = FCo2RefOUT + XSI3;
+
+
+%% SECOND REACTEUR WGS
+
+[XSI4] = WGS(FCoWGS1OUT,FEauWGS1OUT,FH2WGS1OUT,FCo2WGS1OUT,470);
+
+%Si complete alors
+%{
+    XSI4 = min (FMethRefOUT, FEauRefOUT);
+%}
+
+FMethWGS2OUT = FMethWGS1OUT;
+FEauWGS2OUT = FEauWGS1OUT- XSI4;
+FH2WGS2OUT = FH2WGS1OUT + XSI4;
+FCoWGS2OUT = FCoWGS1OUT  - XSI4;
+FCo2WGS2OUT = FCo2WGS1OUT + XSI4;
 
 
 %% ENERGIE
 %chauffer gaz reformeur
-FQRefChauffe = cpProc * (TRefOUT - TRefIN) * (FMethRefIN * MMeth + FEauRefIN * MEau ) ;
+FQRefChauffe = cpProc * (TRefOUT - 800) * (FMethRefIN * MMeth + FEauRefIN * MEau ) ;
 
 %Energie reformeur
-FQRefOUT = XSI1 * 224000 + XSI2 * -34000;
+FQRefOUT = XSI1 * 0.224000 + XSI2 * -0.034000;
 
-%refroidir gaz refromeur - WGS
-FQRefWGSFroid = cpProc * (TRefOUT-TWGS) * (FMethRefOUT * MMeth + FEauRefOUT * MEau ...
+%refroidir gaz refromeur - WGS1
+FQRefWGSFroid = cpProc * (TWGS - TRefOUT) * (FMethRefOUT * MMeth + FEauRefOUT * MEau ...
     + FH2RefOUT * MH2 + FCoRefOUT * MCo + FCo2RefOUT * MCo2);
 
-%Energie reformeur
-FQWGSOUT = XSI3 * -34000;
+%Energie WGS1
+FQWGS1OUT = XSI3 * -0.040000;
+
+%refroidir gaz WGS1 - WGS2
+FQWGS1WGS2Froid = cpProc * (470 -TWGS) * (FMethWGS1OUT * MMeth + FEauWGS1OUT * MEau ...
+    + FH2WGS1OUT * MH2 + FCoWGS1OUT * MCo + FCo2WGS1OUT * MCo2);
+
+%Energie WGS2
+FQWGS2OUT = XSI4* -0.040000;
+
+%EST CE QUE C'EST TOUJOURS TREFIN = 800 ????
+
+%TRefIN
+%TRefIN = TRefIN + (FQRefWGSFroid + FQWGS1WGS2Froid) / (cpProc* (FMethRefIN * MMeth + FEauRefIN * MEau ));
 
 %Calcul de l'enerige necessaire
-FmolFourIN = ChaleurFour((FQRefChauffe + FQRefOUT + FQRefWGSFroid + FQWGSOUT),TFourIN, TFourOUT);
+FmolFourIN = ChaleurFour((FQRefChauffe + FQRefOUT),TFourIN, TFourOUT);
 
 %chauffer gaz four
 FQFourChauffe = cpFour * (TFourOUT - TFourIN) *  FmolFourIN * (MMeth + MAir*20/19);
 
 %Energie combustion
-FQFour = FmolFourIN *-803000;
+FQFour = FmolFourIN *-0.803000;
 
 FMethFourIN = FmolFourIN;
 FO2FourIN = FmolFourIN * 2 * 20/19;
@@ -111,25 +135,37 @@ FCo2FourOUT = FmolFourIN;
 %% Metanation
 %CHANGER PAR LE MIN FAIS PAS LE CON PHILIPPE
 
-FMethMethOUT = FMethWGSOUT + FCoRefOUT;
-FH2MethOUT = FEauWGSOUT - 3*FCoRefOUT;
-FEauMethOUT = FCoRefOUT;
+FMethMethOUT = FMethWGS2OUT + FCoWGS2OUT;
+FH2MethOUT = FH2WGS2OUT - 3*FCoWGS2OUT;
+FEauMethOUT = FCoWGS2OUT;
 
 %% Resultat
 
 %Meth Eau Co Co2 H2
 Tab1 = [FMethRefIN FEauRefIN 0 0 0;...
     FMethRefOUT FEauRefOUT FCoRefOUT FCo2RefOUT FH2RefOUT;...
-    FMethWGSOUT FEauWGSOUT FCoWGSOUT FCo2WGSOUT FH2WGSOUT;...
-    FMethWGSOUT 0 FCoWGSOUT 0 FH2WGSOUT;...
+    FMethWGS1OUT FEauWGS1OUT FCoWGS1OUT FCo2WGS1OUT FH2WGS1OUT;...
+    FMethWGS2OUT FEauWGS2OUT FCoWGS2OUT FCo2WGS2OUT FH2WGS2OUT;...
+    FMethWGS2OUT 0 FCoWGS2OUT 0 FH2WGS2OUT;...
     FMethMethOUT FEauMethOUT 0 0 FH2MethOUT;...
     FMethMethOUT FEauMethOUT 0 0 FH2MethOUT];
 Tab1(end,:) = Tab1(end,:) * 86400  .*[MMeth, MEau, MCo, MCo2, MH2] / 10^3;
 
 %Meth Eau Air
 format bank
-Tab2 = [FMethFourIN 0 FAirFourIN; FMethFourIN 0 FAirFourIN; FMethFourIN+FMethRefIN FEauRefIN FAirFourIN; FMethFourIN+FMethRefIN FEauRefIN FAirFourIN];
-Tab2(2,:) = Tab2(2,:) * 86400  .*[MMeth MEau MAir] / 10^3;
-Tab2(4,:) = Tab2(4,:)* 86400  .*[MMeth MEau MAir] / 10^3;
+Tab2 = [FMethFourIN 0 FO2FourIN FN2FourIN FAirFourIN;...
+    FMethFourIN 0 FO2FourIN FN2FourIN FAirFourIN;...
+    FMethFourIN+FMethRefIN FEauRefIN FO2FourIN FN2FourIN FAirFourIN;...
+    FMethFourIN+FMethRefIN FEauRefIN FO2FourIN FN2FourIN FAirFourIN];
+Tab2(2,:) = Tab2(2,:) * 86400  .*[MMeth MEau MO2 MN2 MAir] / 10^3;
+Tab2(4,:) = Tab2(4,:)* 86400  .*[MMeth MEau MO2 MN2 MAir] / 10^3;
+
+%Chaleur
+Tab3 = {FQFourChauffe FQFour FQRefChauffe FQRefOUT FQRefWGSFroid FQWGS1OUT FQWGS1WGS2Froid FQWGS2OUT;...
+    'Donnee', 'Reçue', 'Donnee', 'Donnee', 'reçue', 'reçue', 'reçue', 'reçue'}';
+
+%Purete
+Purete =FH2MethOUT/(FMethMethOUT + FH2MethOUT);
+
 end
 

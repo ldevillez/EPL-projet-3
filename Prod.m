@@ -65,10 +65,14 @@ TRef=get(slider7,'Value');
 TWGS=get(slider3,'Value');
 MMeth=400;
 MEau=1500;
-[tab1 tab2] = Gestion(MMeth, MEau,TRef,TWGS);
+[tab1 tab2 tab3 purete] = Gestion(MMeth, MEau,TRef,TWGS);
 format bank
  set(handles.uitable1,'data',tab1);
  set(handles.uitable6,'data',tab2);
+ set(handles.text12,'String',MEau*0.016/(MMeth*0.018));
+ set(handles.uitable8,'data',tab3);
+ set(handles.text14,'String',purete);
+ 
 % Update handles structure
 guidata(hObject, handles);
 
@@ -99,10 +103,11 @@ global TRef TWGS MMeth MEau;
 
 set(handles.text8,'String',num2str(get(hObject,'Value')));
 TWGS = get(hObject,'Value');
-[tab1 tab2] = Gestion(MMeth, MEau,TRef,TWGS);
+[tab1 tab2 tab3 purete] = Gestion(MMeth, MEau,TRef,TWGS);
  set(handles.uitable1,'data',tab1);
  set(handles.uitable6,'data',tab2);
-
+ set(handles.uitable8,'data',tab3);
+ set(handles.text14,'String',purete);
 
 % --- Executes during object creation, after setting all properties.
 function slider3_CreateFcn(hObject, eventdata, handles)
@@ -130,10 +135,11 @@ global TRef TWGS MMeth MEau;
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 set(handles.text7,'String',num2str(get(hObject,'Value')));
 TRef = get(hObject,'Value');
-[tab1 tab2] = Gestion(MMeth, MEau,TRef,TWGS);
+[tab1 tab2 tab3 purete] = Gestion(MMeth, MEau,TRef,TWGS);
  set(handles.uitable1,'data',tab1);
  set(handles.uitable6,'data',tab2);
-
+ set(handles.uitable8,'data',tab3);
+ set(handles.text14,'String',purete);
 
 % --- Executes during object creation, after setting all properties.
 function slider7_CreateFcn(hObject, eventdata, handles)
@@ -165,11 +171,13 @@ global TRef TWGS MMeth MEau;
 
 % Hints: get(hObject,'String') returns contents of edit3 as text
 %        str2double(get(hObject,'String')) returns contents of edit3 as a double
-MMeth = num2str(get(HObject,'String'));
-[tab1 tab2] = Gestion(MMeth, MEau,TRef,TWGS);
+MMeth = str2num(get(hObject,'String'));
+[tab1 tab2 tab3 purete] = Gestion(MMeth, MEau,TRef,TWGS);
  set(handles.uitable1,'data',tab1);
  set(handles.uitable6,'data',tab2);
-
+  set(handles.text12,'String',MEau*0.016/(MMeth*0.018));
+ set(handles.uitable8,'data',tab3);
+ set(handles.text14,'String',purete);
 
 % --- Executes during object creation, after setting all properties.
 function edit3_CreateFcn(hObject, eventdata, handles)
@@ -195,10 +203,13 @@ global TRef TWGS MMeth MEau;
 
 % Hints: get(hObject,'String') returns contents of edit4 as text
 %        str2double(get(hObject,'String')) returns contents of edit4 as a double
-MEau = num2str(get(HObject,'String'));
-[tab1 tab2] = Gestion(MMeth, MEau,TRef,TWGS);
+MEau = str2num(get(hObject,'String'));
+[tab1 tab2 tab3 purete] = Gestion(MMeth, MEau,TRef,TWGS);
  set(handles.uitable1,'data',tab1);
  set(handles.uitable6,'data',tab2);
+ set(handles.text12,'String',MEau*0.016/(MMeth*0.018));
+  set(handles.uitable8,'data',tab3);
+ set(handles.text14,'String',purete);
 
 % --- Executes during object creation, after setting all properties.
 function edit4_CreateFcn(hObject, eventdata, handles)
