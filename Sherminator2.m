@@ -17,8 +17,8 @@ while ds<=limite && (abs(x-xprev)>=seuil && abs(y-yprev)>=seuil)
     J = [ComputePol(Ax,xprev,yprev) ComputePol(Ay,xprev,yprev); ComputePol(Bx,xprev,yprev) ComputePol(By,xprev,yprev)];
     sol = [ComputePol(A,xprev,yprev);ComputePol(B,xprev,yprev)];
     z = [xprev  ; yprev] - (J\sol);
-    x=Z(1);
-    y=Z(2);
+    x=z(1);
+    y=z(2);
     ds=ds+1;
 end
 

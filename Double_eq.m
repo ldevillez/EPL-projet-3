@@ -21,7 +21,7 @@ e = [4 4*n1+4*n2 pop];
 Q = (conv2(a,b).*P^2)-K1*(conv2(conv2(c,d),e));
 R = ([0 0 0;0 3 0;0 0 1]-K2*[-1 n2 0; 0 0 -n2; 0 0 1]);
 
-[xsi1 xsi2]=Sherminator2(Q,-R)
+[xsi1 xsi2]=Sherminator2(Q,-R);
 
 
 end
