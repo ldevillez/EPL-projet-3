@@ -1,4 +1,4 @@
-function [ ] = ShowMeYouSoul( )
+function [ ] = ShowMeYourSoul( )
 
 %WGS
 
