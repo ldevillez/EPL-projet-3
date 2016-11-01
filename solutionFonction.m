@@ -2,8 +2,7 @@ function [solutionEq] = solutionFonction(fun, depart)
 %SOLUTIONFONCTION résout des équations non linéaires.
 %
 %   SOLUTIONFONCTION résout des équations du type f(x) = 0 
-%   f est une fonction à une ou plusieurs variables et x est un vecteur
-%   dont la dimension correspond au nombre de variables de f.
+%   f est une fonction à une variable et x est un nombre
 %
 %   On utilise l'algorithme de Newton pour résoudre ces équations. 
 %   L'algorithme de newton fonctionne grace à la formule suivante :
