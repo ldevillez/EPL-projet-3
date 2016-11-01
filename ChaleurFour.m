@@ -7,7 +7,7 @@ options = optimset('Display','off');
 
 
 fct = @(V)[Q + cpFour * (T2-T1) * V * (0.016 + 2*0.02896 *20/19* 100/21) + V * -0.803];
-mol= fsolve(fct,[100],options);
+mol= solutionFonction(fct,[100]);
 
 
 end
