@@ -30,7 +30,7 @@ function [Tab1, Tab2,Tab3,Purete] = Gestion(FMethRefIN, FEauRefIN, TRefOUT, TWGS
 %   Total[T/J]
 %
 %           -Tab3: Tableau contenant les flux de chaleur au sein du procede
-%           et indique si ils sont recu ou cede [MJ]
+%           et indique si ils sont recu ou cede
 %   Four: Augmenter la temprature 
 %   Four: Combustion
 %   Reformeur: Augmenter la temperature
@@ -57,29 +57,28 @@ function [Tab1, Tab2,Tab3,Purete] = Gestion(FMethRefIN, FEauRefIN, TRefOUT, TWGS
 %CO2 = CO2
 
 %% On met des parametre par default si besoin
-if(~isnumeric(FMethRefIN)|isempty(FMethRefIN))
+if(~isnumeric(FMethRefIN))
     FMethRefIN = 400;
 end
-if(~isnumeric(FEauRefIN)|isempty(FEauRefIN))
+if(~isnumeric(FEauRefIN))
     FEauRefIN = 1500;
 end
-if(~isnumeric(TRefOUT)|isempty(TRefOUT))
+if(~isnumeric(TRefOUT))
     TRefOUT = 1108;
 end
-if(~isnumeric(TWGS)|isempty(TWGS))
+if(~isnumeric(TWGS))
     TWGS = 650;
 end
 
 format long
 %% Declaration et changement d'unite
 
-cpFour = 0.001200;%[MJ/kgK]
-cpProc = 0.002900 ;%[MJ/kgK]
+cpFour = 0.001200;%[J/kgK]
+cpProc = 0.002900 ;%[J/kgK]
 TFourIN = 300; %[K]
 TFourOUT = 1300; %[K]
 TRefIN = 300; %[K]
 
-% Masse molaire [Kg]
 MMeth = 0.016;
 MEau = 0.018;
 MH2 = 0.002;
@@ -104,6 +103,10 @@ FCo2RefOUT = XSI2;
 %% PREMIER REACTEUR WGS
 [XSI3] = WGS(FCoRefOUT,FEauRefOUT,FH2RefOUT,FCo2RefOUT,670);
 
+%Si complete alors
+%{
+    XSI3 = min (FMethRefOUT, FEauRefOUT);
+%}
 
 FMethWGS1OUT = FMethRefOUT;
 FEauWGS1OUT = FEauRefOUT- XSI3;
@@ -116,6 +119,10 @@ FCo2WGS1OUT = FCo2RefOUT + XSI3;
 
 [XSI4] = WGS(FCoWGS1OUT,FEauWGS1OUT,FH2WGS1OUT,FCo2WGS1OUT,TWGS);
 
+%Si complete alors
+%{
+    XSI4 = min (FMethRefOUT, FEauRefOUT);
+%}
 
 FMethWGS2OUT = FMethWGS1OUT;
 FEauWGS2OUT = FEauWGS1OUT- XSI4;
@@ -145,6 +152,11 @@ FQWGS1WGS2Froid = cpProc * (470 -TWGS) * (FMethWGS1OUT * MMeth + FEauWGS1OUT * M
 %Energie WGS2
 FQWGS2OUT = XSI4* -0.040000;
 
+%EST CE QUE C'EST TOUJOURS TREFIN = 800 ????
+
+%TRefIN
+%TRefIN = TRefIN + (FQRefWGSFroid + FQWGS1WGS2Froid) / (cpProc* (FMethRefIN * MMeth + FEauRefIN * MEau ));
+
 %Calcul de l'enerige necessaire
 FmolFourIN = ChaleurFour((FQRefChauffe + FQRefOUT),TFourIN, TFourOUT);
 
@@ -164,14 +176,13 @@ FEauFourOUT = 2 * FmolFourIN;
 FCo2FourOUT = FmolFourIN;
 
 %% Metanation
+%CHANGER PAR LE MIN FAIS PAS LE CON PHILIPPE
 
 FMethMethOUT = FMethWGS2OUT + FCoWGS2OUT;
 FH2MethOUT = FH2WGS2OUT - 3*FCoWGS2OUT;
 FEauMethOUT = FCoWGS2OUT;
 
 %% Resultat
-
-%On stock dans les tableaux
 
 %Meth Eau Co Co2 H2
 Tab1 = [FMethRefIN FEauRefIN 0 0 0;...
@@ -183,7 +194,7 @@ Tab1 = [FMethRefIN FEauRefIN 0 0 0;...
     FMethMethOUT FEauMethOUT 0 0 FH2MethOUT];
 Tab1(end,:) = Tab1(end,:) * 86400  .*[MMeth, MEau, MCo, MCo2, MH2] / 10^3;
 
-%Meth Eau O2 N2 Air
+%Meth Eau Air
 format bank
 Tab2 = [FMethFourIN 0 FO2FourIN FN2FourIN FAirFourIN;...
     FMethFourIN 0 FO2FourIN FN2FourIN FAirFourIN;...

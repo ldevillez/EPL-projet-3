@@ -1,4 +1,4 @@
-function [x,y] = Sherminator2(A,B)
+function [x,y] = Solvator(A,B)
 
 [Ax Ay] = devPol(A);
 [Bx By] = devPol(B);
