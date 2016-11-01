@@ -27,10 +27,10 @@ x = depart;
 %signifierait que la fonction n'a pas de solution.
 g = [fun(x-delta) fun(x) fun(x+delta)];
 grad = gradient(g,delta);
-while fun(x) > 0 + delt*delt | fun(x) < 0 - delt*delt | grad > 10^(-15) | grad < -10^(-15)
+while (fun(x) > 0 + delt*delt | fun(x) < 0 - delt*delt )&( grad > 10^(-15) | grad < -10^(-15))
     g = [fun(x-delta) fun(x) fun(x+delta)];%vecteur nécessaire au calcul du gradient
     grad = gradient(g,delta);% gradient de la fonction
-    x = x - fun(x)./grad;
+    x = x - fun(x)./grad(1:length(x));
 end
 
 %Si on arrête la boucle pcq le grad est trop petit, cela signifie peut-être

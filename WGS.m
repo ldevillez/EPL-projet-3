@@ -10,7 +10,7 @@ options = optimset('Display','off');
 Fct = @(XSI1)[(c+XSI1).*(d+XSI1)./((a-XSI1).*(b-XSI1))- K];
 Pol = conv([1 c], [1 d]) - K*conv([-1 a],[-1 b]);
 XSI1 = min(roots(Pol));
-%XSI1 = fsolve(Fct,20,options)
+%XSI1 = solutionFonction(Fct,[20])
 
 end
 
