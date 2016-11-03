@@ -1,16 +1,15 @@
 function [ XSI1 ] = WGS(a, b, c, d, T)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+
+%Constante d'equilibre
 
 K = 10 .^(1910 ./ T - 1.764);
 P = 24;
 
-options = optimset('Display','off');
-
-Fct = @(XSI1)[(c+XSI1).*(d+XSI1)./((a-XSI1).*(b-XSI1))- K];
+%Fonction sous forme de polynome
 Pol = conv([1 c], [1 d]) - K*conv([-1 a],[-1 b]);
+%Racide de ce polynome
 XSI1 = min(roots(Pol));
-%XSI1 = solutionFonction(Fct,[20]);
+
 
 end
 

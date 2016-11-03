@@ -149,7 +149,7 @@ FQWGS2OUT = XSI4* -0.040000;
 FmolFourIN = ChaleurFour((FQRefChauffe + FQRefOUT),TFourIN, TFourOUT);
 
 %chauffer gaz four
-FQFourChauffe = cpFour * (TFourOUT - TFourIN) *  FmolFourIN * (MMeth + MAir*20/19);
+FQFourChauffe = cpFour * (TFourOUT - TFourIN) *  FmolFourIN * (0.016 + 2*0.02896 *20/19* 100/21);
 
 %Energie combustion
 FQFour = FmolFourIN *-0.803000;

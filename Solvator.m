@@ -1,6 +1,6 @@
 function [x,y] = Solvator(A,B)
 %Solvator est une fonction permettant d'approximer les solutions du
-%systement:
+%systeme:
 %
 %   |A(x,y) = 0
 %   |B(x,y) = 0
@@ -19,6 +19,9 @@ function [x,y] = Solvator(A,B)
 %   Y^n-1
 %   Y^n
 %
+% On utilisera la methode de Newton-Raphson:
+%
+%   (xK,yK) = [xk-1,yk-1] - J(xk-1,yk-1) * [A(xk-1,yk-1), B(xk-1,yk-1)]
 
 % On derive A et B
 [Ax Ay] = devPol(A);
@@ -56,15 +59,18 @@ while ds<=limite && (abs(x-xprev)>=seuil && abs(y-yprev)>=seuil)
     %Via la formule de Newton rafton 
     z = [xprev  ; yprev] - (J\sol);
     
-    %
+    %On remplace x,y par notre nouvelle approximation
     x=z(1);
     y=z(2);
+    % On rajoute une iteration
     ds=ds+1;
 end
 
 end
 
+
 function [dX dY] = devPol(A)
+%Fonction derivant un polynome a deux var
     dX = A;
     dX(:,end) = [];
     m = size(dX,2);
@@ -80,6 +86,7 @@ function [dX dY] = devPol(A)
 end
 
 function p = ComputePol(A,x,y)
+%Calcule la valeur du'n polynome a deux var
     m = size(A,2);
     n = size(A,1);
     
